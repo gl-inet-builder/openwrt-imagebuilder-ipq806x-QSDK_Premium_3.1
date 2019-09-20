@@ -60,7 +60,6 @@ OPKG:= \
   IPKG_CONF_DIR="$(TMP_DIR)" \
   IPKG_OFFLINE_ROOT="$(TARGET_DIR)" \
   $(STAGING_DIR_HOST)/bin/opkg \
-	-f $(TOPDIR)/repositories.conf \
 	--force-depends \
 	--force-overwrite \
 	--force-postinstall \
@@ -69,6 +68,11 @@ OPKG:= \
 	--add-dest root:/ \
 	--add-arch all:100 \
 	--add-arch $(ARCH_PACKAGES):200
+ifeq ($(OFFLINE), True)
+	OPKG+=-f $(TOPDIR)/repositories_offline.conf
+else
+	OPKG+=-f $(TOPDIR)/repositories.conf
+endif
 
 define Profile
   $(eval $(call Profile/Default))
@@ -102,7 +106,7 @@ _call_image:
 	echo
 	rm -rf $(TARGET_DIR)
 	mkdir -p $(TARGET_DIR) $(BIN_DIR) $(TMP_DIR) $(DL_DIR)
-	if [ ! -f "$(PACKAGE_DIR)/Packages" ] || [ ! -f "$(PACKAGE_DIR)/Packages.gz" ] || [ "`find $(PACKAGE_DIR) -cnewer $(PACKAGE_DIR)/Packages.gz`" ]; then \
+	if [ ! -f "$(DL_DIR))/Packages" ] || [ ! -f "$(PACKAGE_DIR)/Packages" ] || [ ! -f "$(PACKAGE_DIR)/Packages.gz" ] || [ "`find $(PACKAGE_DIR) -cnewer $(PACKAGE_DIR)/Packages.gz`" ]; then \
 		echo "Package list missing or not up-to-date, generating it.";\
 		$(MAKE) package_index; \
 	else \
@@ -121,6 +125,9 @@ package_index: FORCE
 	@echo Building package index...
 	@mkdir -p $(TMP_DIR) $(TARGET_DIR)/tmp
 	(cd $(PACKAGE_DIR); $(SCRIPT_DIR)/ipkg-make-index.sh . > Packages && \
+		gzip -9c Packages > Packages.gz \
+	) >/dev/null 2>/dev/null
+	(cd $(DL_DIR); $(SCRIPT_DIR)/ipkg-make-index.sh . > Packages && \
 		gzip -9c Packages > Packages.gz \
 	) >/dev/null 2>/dev/null
 	$(OPKG) update || true
