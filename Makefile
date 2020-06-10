@@ -182,7 +182,8 @@ si: FORCE
 	cp $(TOPDIR)/single_img_dir/IPQ4019.ILQ.5.0/common/build/*-flash.conf $(TOPDIR)/single_img_dir/IPQ4019.ILQ.5.0/common/build/ipq
 	cd single_img_dir/IPQ4019.ILQ.5.0/common/build; \
 	python pack.py -t nor -B -F appsboardconfig_premium -o ../../../b1300-nor-apps.img ./ipq; \
-	python pack.py -t norplusemmc -B -F appsboardconfig_premium -o ../../../s1300-noremmc-apps.img ./ipq
+	python pack.py -t norplusemmc -B -F appsboardconfig_premium -o ../../../s1300-noremmc-apps.img ./ipq; \
+	python pack.py -t norplusnand -B -F appsboardconfig_premium -o ../../../ap1300-nornand-apps.img ./ipq
 
 info:
 	(unset PROFILE FILES PACKAGES MAKEFLAGS; $(MAKE) -s _call_info)

@@ -29,7 +29,7 @@
 
 		spi_0: spi@78b5000 { /* BLSP1 QUP1 */
 			status = "ok";
-			cs-gpios = <&tlmm 54 0>, <&tlmm 59 0>;
+			cs-gpios = <&tlmm 54 0>, <&tlmm 5 0>;
 			num-cs = <2>;
 
 			mt29f@1 {
